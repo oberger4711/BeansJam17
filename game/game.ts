@@ -1,5 +1,6 @@
 /// <reference path="phaser.d.ts"/>
 /// <reference path="preload/preload.ts"/>
+/// <reference path="level/level.ts"/>
 
 module GameJam {
 	export class MyGame extends Phaser.Game {
@@ -8,8 +9,7 @@ module GameJam {
 			super(900, 600, Phaser.CANVAS, 'content', undefined, undefined, false);
 
 			this.state.add("preload", Preload.Preload);
-			// TODO: Add more states.
-			//this.state.add("intro", Intro.Intro);
+			this.state.add("level", Level.Level);
 
 			this.state.start("preload");
 		}
