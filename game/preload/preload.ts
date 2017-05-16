@@ -1,6 +1,7 @@
 /// <reference path="../phaser.d.ts"/>
 
 module GameJam.Preload {
+
 	export class Preload extends Phaser.State {
 
 		preload() {
@@ -29,7 +30,5 @@ module GameJam.Preload {
 			// TODO: Switch to next screen.
 			//this.game.state.start("intro", true, false);
 		}
-
 	}
-
 }

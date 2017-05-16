@@ -13,9 +13,7 @@ module GameJam {
 
 			this.state.start("preload");
 		}
-
 	}
-
 }
 
 window.onload = () => {
