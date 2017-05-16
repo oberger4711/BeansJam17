@@ -24,7 +24,7 @@ module GameJam.Preload {
 
 		create() {
 			// Finished loading.
-			//var music = this.game.add.sound('music', undefined, Number.MAX_VALUE);
+			//var music = this.game.add.audio('music', undefined, Number.MAX_VALUE);
 			//music.play();
 			// TODO: Switch to next screen.
 			//this.game.state.start("intro", true, false);
