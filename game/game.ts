@@ -6,7 +6,7 @@ module GameJam {
 	export class MyGame extends Phaser.Game {
 
 		constructor() {
-			super(900, 600, Phaser.CANVAS, 'content', undefined, undefined, false);
+			super(1200, 800, Phaser.CANVAS, 'content', undefined, undefined, false);
 
 			this.state.add("preload", Preload.Preload);
 			this.state.add("level", Level.Level);
