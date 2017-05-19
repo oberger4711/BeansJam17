@@ -10,13 +10,13 @@ module GameJam.Preload {
 
 			// TODO: Load stuff.
 			// Images
-			//this.game.load.image('car', 'assets/car.png');
+			this.game.load.image('tiles', 'assets/maps/tiles/tiles.png');
 
 			// Spritesheets
 			//this.game.load.spritesheet('player', 'assets/player.png', 64, 64);
 
 			// Maps
-			//this.game.load.json('lvl0', 'assets/0.json');
+			this.game.load.tilemap('map_test', 'assets/maps/map_test.json', null, Phaser.Tilemap.TILED_JSON);
 
 			// Sound
 			//this.game.load.audio('music', 'assets/music.mp3');
@@ -25,7 +25,7 @@ module GameJam.Preload {
 
 		create() {
 			// Finished loading.
-			this.game.state.start("level", true, false);
+			this.game.state.start("level", true, false, 0);
 		}
 	}
 }
