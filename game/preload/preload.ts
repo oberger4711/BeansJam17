@@ -13,7 +13,7 @@ module GameJam.Preload {
 			this.game.load.image('tiles', 'assets/maps/tiles/tiles.png');
 
 			// Spritesheets
-			//this.game.load.spritesheet('player', 'assets/player.png', 64, 64);
+			this.game.load.spritesheet('player', 'assets/spritesheets/player.png', 32, 64);
 
 			// Maps
 			this.game.load.tilemap('map_test', 'assets/maps/map_test.json', null, Phaser.Tilemap.TILED_JSON);
