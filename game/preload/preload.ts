@@ -17,6 +17,7 @@ module GameJam.Preload {
 			// Maps
 			this.game.load.tilemap('map_test', 'assets/maps/map_test.json', null, Phaser.Tilemap.TILED_JSON);
 			this.game.load.tilemap('map_container_test', 'assets/maps/map_container_test.json', null, Phaser.Tilemap.TILED_JSON);
+			this.game.load.tilemap('map_sticky_test', 'assets/maps/map_sticky_test.json', null, Phaser.Tilemap.TILED_JSON);
 
 			// Sound
 			//this.game.load.audio('music', 'assets/music.mp3');

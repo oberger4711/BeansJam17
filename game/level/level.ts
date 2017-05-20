@@ -2,8 +2,8 @@
 
 module GameJam.Level {
 
-	const LEVEL_MAP_LIST : string[] = ['map_container_test', 'map_test'];
-	const NUMBER_OF_TRIES_MAP_LIST : number[] = [5, 3];
+	const LEVEL_MAP_LIST : string[] = ['map_container_test', 'map_sticky_test', 'map_test'];
+	const NUMBER_OF_TRIES_MAP_LIST : number[] = [50, 50, 3];
 	const PLAYER_VELOCITY : number = 200;
 	const VICTIM_VELOCITY : number = 150;
 	const TILE_WIDTH : number = 100;
@@ -196,6 +196,31 @@ module GameJam.Level {
 				this.game.physics.arcade.overlap(this.player, this.layerDarkness, this.onPlayerOverlapsWithDarkness, null, this);
 				console.log("In Darkness : " + this.playerInDarkness);
 				if (this.numberOfTriesLeft > 0 && this.playerInDarkness) {
+					// Rotate sprite to head away from the tile.
+					let diff : Phaser.Point = Phaser.Point.subtract(new Phaser.Point(spaceShipTile.worldX + TILE_WIDTH / 2, spaceShipTile.worldY + TILE_HEIGHT / 2), this.player.position);
+					this.player.body.moves = false;
+					this.player.body.angularVelocity = 0;
+					if (Math.abs(diff.x) > Math.abs(diff.y)) {
+						if (diff.x > 0) {
+							// From right
+							this.player.rotation = -Math.PI / 2;
+						}
+						else {
+							// From left
+							this.player.rotation = Math.PI / 2;
+						}
+					}
+					else {
+						if (diff.y > 0) {
+							// From top
+							this.player.rotation = 0;
+						}
+						else {
+							// From bottom
+							this.player.rotation = Math.PI;
+						}
+					}
+					this.player.body.moves = true;
 					this.transitionToState(ELevelState.STICKING);
 				}
 				else {
@@ -244,11 +269,9 @@ module GameJam.Level {
 			}
 			console.log("Transitioning from level state " + ELevelState[this.levelState] + " to level state " + ELevelState[next] + ".");
 			if (next == ELevelState.STICKING) {
-				this.player.rotation = 0;
 				this.player.body.velocity.x = 0;
 				this.player.body.velocity.y = 0;
 				this.player.body.angularVelocity = 0;
-				this.player.rotation = 0;
 				this.player.animations.play('stick');
 			}
 			if (next == ELevelState.FLYING) {
