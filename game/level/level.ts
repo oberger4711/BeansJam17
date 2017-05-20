@@ -116,8 +116,9 @@ module GameJam.Level {
 			this.player = this.game.add.sprite(x + TILE_WIDTH / 2, y + TILE_HEIGHT / 2, 'player');
 			this.player.anchor.x = 0.5;
 			this.player.anchor.y = 0.5;
-			this.player.animations.add('fly', [0, 1, 2, 3, 4, 5, 6, 7], 100, true);
-			this.player.animations.add('stick', [1], 100, true);
+			this.player.animations.add('fly', [0, 1, 2, 3, 4, 5, 6, 7], 10, true);
+			this.player.animations.add('stick', [8], 1, true);
+			this.player.animations.add('bounce', [9], 1, true);
 			this.player.animations.play('fly');
 			this.game.physics.arcade.enable(this.player);
 			this.player.body.velocity.x = -PLAYER_VELOCITY;
@@ -203,7 +204,8 @@ module GameJam.Level {
 			}
 			else {
 				// Bouncy tile
-				this.player.body.angularVelocity = 500;
+				this.player.body.angularVelocity = -500;
+				this.player.animations.play('bounce');
 			}
 		}
 
