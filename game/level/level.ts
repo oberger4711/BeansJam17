@@ -8,6 +8,11 @@ module GameJam.Level {
 	const VICTIM_VELOCITY : number = 150;
 	const TILE_WIDTH : number = 100;
 	const TILE_HEIGHT : number = TILE_WIDTH;
+	const TILE_INDEX_START_GRIPPY : number = 1;
+	const TILE_INDEX_END_GRIPPY : number = 1;
+	const TILE_INDEX_START_BOUNCE : number = 3;
+	const TILE_INDEX_END_BOUNCE : number = 3;
+	const TILE_INDEX_DARKNESS : number = 9;
 
 	enum ELevelState {
 		FLYING,
@@ -55,8 +60,9 @@ module GameJam.Level {
 			this.map = this.game.add.tilemap(this.mapName);
 			this.map.addTilesetImage('tiles');
 			this.map.addTilesetImage('darkness');
-			this.map.setCollisionBetween(1, 1);
-			this.map.setCollisionBetween(3, 3);
+			this.map.setCollisionBetween(TILE_INDEX_START_GRIPPY, TILE_INDEX_END_GRIPPY);
+			this.map.setCollisionBetween(TILE_INDEX_START_BOUNCE, TILE_INDEX_END_BOUNCE);
+			this.map.setCollisionBetween(TILE_INDEX_DARKNESS, TILE_INDEX_DARKNESS);
 
 			// Parse tiles.
 			this.layerSpaceship = this.map.createLayer('Spaceship');
@@ -116,6 +122,7 @@ module GameJam.Level {
 			this.game.physics.arcade.enable(this.player);
 			this.player.body.velocity.x = -PLAYER_VELOCITY;
 			this.player.body.velocity.y = 0;
+			this.player.body.bounce.set(1);
 			this.levelState = ELevelState.FLYING;
 			this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_LOCKON, 0.1, 0.1);
 		}
@@ -182,15 +189,21 @@ module GameJam.Level {
 
 		private onPlayerCollidesWithSpaceShip(player, spaceShipTile) {
 			console.log("Collision detected of player with spaceship tile of index " + spaceShipTile.index + ".");
-			this.playerInDarkness = false;
-			this.game.physics.arcade.overlap(this.player, this.layerDarkness, this.onPlayerOverlapsWithDarkness, null, this);
-			console.log("In Darkness : " + this.playerInDarkness);
-			if (this.numberOfTriesLeft > 0 && this.playerInDarkness) {
-				this.transitionToState(ELevelState.STICKING);
+			if (this.shouldStickToSpaceShipTile(spaceShipTile)) {
+				this.playerInDarkness = false;
+				this.game.physics.arcade.overlap(this.player, this.layerDarkness, this.onPlayerOverlapsWithDarkness, null, this);
+				console.log("In Darkness : " + this.playerInDarkness);
+				if (this.numberOfTriesLeft > 0 && this.playerInDarkness) {
+					this.transitionToState(ELevelState.STICKING);
+				}
+				else {
+					this.transitionToState(ELevelState.LOST);
+				}
 			}
-			else {
-				this.transitionToState(ELevelState.LOST);
-			}
+		}
+
+		private shouldStickToSpaceShipTile(spaceShipTile) : boolean {
+			return !(TILE_INDEX_START_BOUNCE <= spaceShipTile.index && spaceShipTile.index <= TILE_INDEX_END_BOUNCE);
 		}
 
 		private onPlayerOverlapsWithDarkness(player, darknessTile) {
