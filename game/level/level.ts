@@ -3,6 +3,7 @@
 module GameJam.Level {
 
 	const LEVEL_MAP_LIST : string[] = ['map_test'];
+	const RETRY_MAP_LIST : number[] = [3];
 	const PLAYER_VELOCITY : number = 200;
 	const VICTIM_VELOCITY : number = 150;
 	const TILE_WIDTH : number = 100;
@@ -94,8 +95,8 @@ module GameJam.Level {
 			this.player = this.game.add.sprite(x + TILE_WIDTH / 2, y + TILE_HEIGHT / 2, 'player');
 			this.player.anchor.x = 0.5;
 			this.player.anchor.y = 0.5;
-			this.player.animations.add('fly', [0, 1], 100, true);
-			this.player.animations.add('stick', [2, 3], 100, true);
+			this.player.animations.add('fly', [0], 100, true);
+			this.player.animations.add('stick', [1], 100, true);
 			this.player.animations.play('fly');
 			this.game.physics.arcade.enable(this.player);
 			this.player.body.velocity.x = -PLAYER_VELOCITY;

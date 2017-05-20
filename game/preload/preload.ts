@@ -13,7 +13,7 @@ module GameJam.Preload {
 			this.game.load.image('tiles', 'assets/maps/tiles/tiles.png');
 
 			// Spritesheets
-			this.game.load.spritesheet('player', 'assets/spritesheets/player.png', 32, 64);
+			this.game.load.spritesheet('player', 'assets/spritesheets/player.png', 64, 64);
 			this.game.load.spritesheet('victim', 'assets/spritesheets/victim.png', 32, 64);
 			this.game.load.spritesheet('container', 'assets/spritesheets/container.png', 100, 100);
 
