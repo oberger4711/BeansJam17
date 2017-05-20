@@ -153,8 +153,6 @@ module GameJam.Level {
 				if (this.levelState == ELevelState.STICKING) {
 					// Update flight line.
 					this.flightLine.start = this.player.position;
-					//this.flightLine.start.x = this.player.position.x - this.game.camera.view.x;
-					//this.flightLine.start.y = this.player.position.y - this.game.camera.view.y;
 					this.flightLine.end.x = this.game.input.activePointer.position.x + this.game.camera.view.x;
 					this.flightLine.end.y = this.game.input.activePointer.position.y + this.game.camera.view.y;
 				}
