@@ -28,6 +28,7 @@ module GameJam.Level {
 		private player : Phaser.Sprite;
 		private flightLine : Phaser.Line;
 		private enemies : Phaser.Group;
+		private numberOfCaughtEnemies : number;
 
 		private levelState : ELevelState;
 
@@ -65,8 +66,11 @@ module GameJam.Level {
 				console.log("Error: Could not find object with type 'Player' in 'Object Layer 1'");
 			}
 
+			// Init other stuff.
 			this.flightLine = new Phaser.Line();
+			this.numberOfCaughtEnemies = 0;
 
+			// Add event handlers.
 			this.game.input.onDown.add(this.onDown, this);
 
 			//this.music = this.game.add.sound('music', 1, true);
@@ -116,7 +120,7 @@ module GameJam.Level {
 		update() {
 			this.game.physics.arcade.collide(this.player, this.layerSpaceship, this.onPlayerCollidesWithSpaceShip, null, this);
 			this.game.physics.arcade.collide(this.enemies, this.layerSpaceship, this.onEnemyCollidesWithSpaceShip, null, this);
-			this.game.physics.arcade.overlap(this.player, this.enemies, this.onPlayerCollidesWithEnemy, null, this);
+			this.game.physics.arcade.overlap(this.player, this.enemies, this.onPlayerOverlapsWithEnemy, null, this);
 			if (this.levelState == ELevelState.STICKING) {
 				// Update flight line.
 				this.flightLine.start = this.player.position;
@@ -136,7 +140,11 @@ module GameJam.Level {
 		private onEnemyCollidesWithSpaceShip(enemy, spaceShipTile) {
 		}
 
-		private onPlayerCollidesWithEnemy(player, enemy) {
+		private onPlayerOverlapsWithEnemy(player, enemy) {
+			if (this.levelState == ELevelState.FLYING) {
+				this.enemies.remove(enemy);
+				this.numberOfCaughtEnemies++;
+			}
 		}
 
 		private transitionToState(next : ELevelState) {
