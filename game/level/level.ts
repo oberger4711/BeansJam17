@@ -2,8 +2,8 @@
 
 module GameJam.Level {
 
-	const LEVEL_MAP_LIST : string[] = ['map_test'];
-	const NUMBER_OF_TRIES_MAP_LIST : number[] = [3];
+	const LEVEL_MAP_LIST : string[] = ['map_container_test', 'map_test'];
+	const NUMBER_OF_TRIES_MAP_LIST : number[] = [5, 3];
 	const PLAYER_VELOCITY : number = 200;
 	const VICTIM_VELOCITY : number = 150;
 	const TILE_WIDTH : number = 100;
@@ -151,7 +151,7 @@ module GameJam.Level {
 			container.anchor.x = 0.5;
 			container.anchor.y = 0.5;
 			container.animations.add('still', [0], 1, false);
-			container.animations.add('fight', [2, 3], 200, true);
+			container.animations.add('fight', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0], 10, false);
 			container.animations.play('still');
 			this.game.physics.arcade.enable(container);
 		}
@@ -190,6 +190,7 @@ module GameJam.Level {
 		private onPlayerCollidesWithSpaceShip(player, spaceShipTile) {
 			console.log("Collision detected of player with spaceship tile of index " + spaceShipTile.index + ".");
 			if (this.shouldStickToSpaceShipTile(spaceShipTile)) {
+				// Sticky tile
 				this.playerInDarkness = false;
 				this.game.physics.arcade.overlap(this.player, this.layerDarkness, this.onPlayerOverlapsWithDarkness, null, this);
 				console.log("In Darkness : " + this.playerInDarkness);
@@ -199,6 +200,10 @@ module GameJam.Level {
 				else {
 					this.transitionToState(ELevelState.LOST);
 				}
+			}
+			else {
+				// Bouncy tile
+				this.player.body.angularVelocity = 500;
 			}
 		}
 
@@ -240,6 +245,8 @@ module GameJam.Level {
 				this.player.rotation = 0;
 				this.player.body.velocity.x = 0;
 				this.player.body.velocity.y = 0;
+				this.player.body.angularVelocity = 0;
+				this.player.rotation = 0;
 				this.player.animations.play('stick');
 			}
 			if (next == ELevelState.FLYING) {
