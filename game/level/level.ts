@@ -22,15 +22,15 @@ module GameJam.Level {
 		}
 
 		create() {
-			this.game.physics.startSystem(Phaser.Physics.ARCADE);
-
 			this.map = this.game.add.tilemap(this.mapName);
 			this.map.addTilesetImage('tiles');
-			this.map.setCollisionBetween(1, 100);
+			this.map.setCollisionBetween(1, 1);
 
 			// Parse tiles.
 			this.layerSpaceship = this.map.createLayer('Tile Layer 1');
 			this.layerSpaceship.resizeWorld();
+
+			this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
 			// Parse objects.
 			for (let obj of this.map.objects['Object Layer 1']) {
@@ -43,8 +43,6 @@ module GameJam.Level {
 				console.log("Error: Could not find object with name 'Player' in 'Object Layer 1'");
 			}
 
-
-
 			//this.music = this.game.add.sound('music', 1, true);
 			//this.music.play();
 		}
@@ -56,6 +54,15 @@ module GameJam.Level {
 			this.game.physics.arcade.enable(this.player);
 			this.player.body.velocity.x = -MAX_FLY_VELOCITY;
 			this.player.body.velocity.y = 0;
+		}
+
+		update() {
+			this.game.physics.arcade.collide(this.player, this.layerSpaceship);
+		}
+
+		render() {
+			this.game.debug.body(this.player);
+			this.game.debug.body(this.layerSpaceship);
 		}
 	}
 }
