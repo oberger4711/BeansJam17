@@ -3,7 +3,7 @@
 module GameJam.Level {
 
 	const LEVEL_MAP_LIST : string[] = ['map_test'];
-	const RETRY_MAP_LIST : number[] = [3];
+	const NUMBER_OF_TRIES_MAP_LIST : number[] = [3];
 	const PLAYER_VELOCITY : number = 200;
 	const VICTIM_VELOCITY : number = 150;
 	const TILE_WIDTH : number = 100;
@@ -12,7 +12,8 @@ module GameJam.Level {
 	enum ELevelState {
 		FLYING,
 		STICKING,
-		WON
+		WON,
+		LOST
 	}
 
 	enum EVictimType {
@@ -28,30 +29,40 @@ module GameJam.Level {
 		private mapName : string;
 		private map : Phaser.Tilemap;
 		private layerSpaceship : Phaser.TilemapLayer;
+		private layerDarkness : Phaser.TilemapLayer;
 		private layerObjects : Phaser.TilemapLayer;
 		private player : Phaser.Sprite;
 		private flightLine : Phaser.Line;
 		private victims : Phaser.Group;
 		private containers : Phaser.Group;
+		private numberOfTriesLeft : number;
 		private numberOfCaughtEnemies : number;
+		private playerInDarkness : boolean;
 		private retryKey : Phaser.Key;
+		private textStyle;
+		private numberOfTriesLeftText : Phaser.Text;
 
 		private levelState : ELevelState;
 
 		init(index : number) {
 			this.mapIndex = index;
 			this.mapName = LEVEL_MAP_LIST[index];
+			this.numberOfTriesLeft = NUMBER_OF_TRIES_MAP_LIST[index];
 			console.log("Initialized level " + this.mapName + ".");
 		}
 
 		create() {
 			this.map = this.game.add.tilemap(this.mapName);
 			this.map.addTilesetImage('tiles');
+			this.map.addTilesetImage('darkness');
 			this.map.setCollisionBetween(1, 1);
+			this.map.setCollisionBetween(3, 3);
 
 			// Parse tiles.
-			this.layerSpaceship = this.map.createLayer('Tile Layer 1');
+			this.layerSpaceship = this.map.createLayer('Spaceship');
 			this.layerSpaceship.resizeWorld();
+			this.layerDarkness = this.map.createLayer('Darkness');
+			this.layerDarkness.resizeWorld();
 
 			this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -59,7 +70,7 @@ module GameJam.Level {
 			this.victims = this.game.add.group();
 			this.containers = this.game.add.group();
 			this.game.physics.arcade.enable(this.victims);
-			for (let obj of this.map.objects['Object Layer 1']) {
+			for (let obj of this.map.objects['Objects']) {
 				if (obj.name == "Player") {
 					this.createPlayer(obj.x, obj.y);
 				}
@@ -74,17 +85,20 @@ module GameJam.Level {
 				}
 			}
 			if (this.player == null) {
-				console.log("Error: Could not find object with type 'Player' in 'Object Layer 1'");
+				console.log("Error: Could not find object with type 'Player' in 'Objects'");
 			}
 
 			// Init other stuff.
 			this.flightLine = new Phaser.Line();
 			this.numberOfCaughtEnemies = 0;
+			this.textStyle = { font: "bold 32px Arial", fill: "#ff0000", boundsAlignH: "center", boundsAlignV: "middle" };
+			this.numberOfTriesLeftText = this.game.add.text(0, 0, "", this.textStyle);
+			this.updateNumberOfTriesLeftText();
 
 			// Add event handlers.
 			this.game.input.onDown.add(this.onClickDown, this);
 			this.retryKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-			this.retryKey.onDown.add(this.onRetryPressed, this);
+			this.retryKey.onDown.add(this.retry, this);
 
 			//this.music = this.game.add.sound('music', 1, true);
 			//this.music.play();
@@ -141,28 +155,48 @@ module GameJam.Level {
 			}
 		}
 
-		onRetryPressed() {
+		retry() {
 			this.game.state.start("level", true, false, this.mapIndex);
 		}
 
 		update() {
-			if (this.levelState != ELevelState.WON) {
+			if (this.levelState != ELevelState.WON && this.levelState != ELevelState.LOST) {
 				this.game.physics.arcade.collide(this.player, this.layerSpaceship, this.onPlayerCollidesWithSpaceShip, null, this);
-				this.game.physics.arcade.collide(this.victims, this.layerSpaceship, this.onVictimCollidesWithSpaceShip, null, this);
+			}
+			this.game.physics.arcade.collide(this.victims, this.layerSpaceship, this.onVictimCollidesWithSpaceShip, null, this);
+			if (this.levelState != ELevelState.WON && this.levelState != ELevelState.LOST) {
 				this.game.physics.arcade.overlap(this.player, this.victims, this.onPlayerOverlapsWithVictim, null, this);
+			}
+			if (this.levelState != ELevelState.WON && this.levelState != ELevelState.LOST) {
 				this.game.physics.arcade.overlap(this.player, this.containers, this.onPlayerOverlapsWithContainer, null, this);
-				if (this.levelState == ELevelState.STICKING) {
-					// Update flight line.
-					this.flightLine.start = this.player.position;
-					this.flightLine.end.x = this.game.input.activePointer.position.x + this.game.camera.view.x;
-					this.flightLine.end.y = this.game.input.activePointer.position.y + this.game.camera.view.y;
-				}
+			}
+			if (this.levelState == ELevelState.STICKING) {
+				// Update flight line.
+				this.flightLine.start = this.player.position;
+				this.flightLine.end.x = this.game.input.activePointer.position.x + this.game.camera.view.x;
+				this.flightLine.end.y = this.game.input.activePointer.position.y + this.game.camera.view.y;
 			}
 		}
 
 		private onPlayerCollidesWithSpaceShip(player, spaceShipTile) {
 			console.log("Collision detected of player with spaceship tile of index " + spaceShipTile.index + ".");
-			this.transitionToState(ELevelState.STICKING);
+			this.playerInDarkness = false;
+			this.game.physics.arcade.overlap(this.player, this.layerDarkness, this.onPlayerOverlapsWithDarkness, null, this);
+			console.log("In Darkness : " + this.playerInDarkness);
+			if (this.numberOfTriesLeft > 0 && this.playerInDarkness) {
+				this.transitionToState(ELevelState.STICKING);
+			}
+			else {
+				this.transitionToState(ELevelState.LOST);
+			}
+		}
+
+		private onPlayerOverlapsWithDarkness(player, darknessTile) {
+			// At least 50 % must intersect to be in darkness.
+			let intersection : Phaser.Rectangle = Phaser.Rectangle.intersection(player.getBounds(), new Phaser.Rectangle(darknessTile.worldX, darknessTile.worldY, darknessTile.width, darknessTile.height));
+			if (intersection.volume > 0.5 * (this.player.width * this.player.height)) {
+				this.playerInDarkness = true;
+			}
 		}
 
 		private onVictimCollidesWithSpaceShip(victim, spaceShipTile) {
@@ -195,13 +229,23 @@ module GameJam.Level {
 				this.player.animations.play('stick');
 			}
 			if (next == ELevelState.FLYING) {
+				this.numberOfTriesLeft--;
+				this.updateNumberOfTriesLeftText();
 				this.player.animations.play('fly');
 			}
 			if (next == ELevelState.WON) {
-				this.player.destroy();
+				this.player.exists = false;
 				this.game.time.events.add(2000, this.switchToNextLevel, this);
 			}
+			if (next == ELevelState.LOST) {
+				this.player.exists = false;
+				this.game.time.events.add(2000, this.retry, this);
+			}
 			this.levelState = next;
+		}
+
+		updateNumberOfTriesLeftText() {
+			this.numberOfTriesLeftText.text = "Tries left: " + this.numberOfTriesLeft;
 		}
 
 		switchToNextLevel() : void {
@@ -210,6 +254,8 @@ module GameJam.Level {
 		}
 
 		render() {
+			this.numberOfTriesLeftText.x = this.game.camera.view.x;
+			this.numberOfTriesLeftText.y = this.game.camera.view.y;
 			if (this.levelState == ELevelState.STICKING) {
 				this.game.debug.geom(this.flightLine);
 			}

@@ -5,12 +5,9 @@ module GameJam.Preload {
 	export class Preload extends Phaser.State {
 
 		preload() {
-			var text = this.game.add.text(this.game.width / 2, this.game.height / 2, "Loading...", { fill : '#ffffff' });
-			text.anchor.set(0.5, 0.5);
-
-			// TODO: Load stuff.
 			// Images
 			this.game.load.image('tiles', 'assets/maps/tiles/tiles.png');
+			this.game.load.image('darkness', 'assets/maps/tiles/darkness.png');
 
 			// Spritesheets
 			this.game.load.spritesheet('player', 'assets/spritesheets/player.png', 64, 64);
