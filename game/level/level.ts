@@ -93,6 +93,7 @@ module GameJam.Level {
 			this.numberOfCaughtEnemies = 0;
 			this.textStyle = { font: "bold 32px Arial", fill: "#ff0000", boundsAlignH: "center", boundsAlignV: "middle" };
 			this.numberOfTriesLeftText = this.game.add.text(0, 0, "", this.textStyle);
+			this.numberOfTriesLeftText.fixedToCamera = true;
 			this.updateNumberOfTriesLeftText();
 
 			// Add event handlers.
@@ -151,6 +152,7 @@ module GameJam.Level {
 		onClickDown(pointer) {
 			if (this.levelState == ELevelState.STICKING) {
 				this.game.physics.arcade.moveToPointer(this.player, PLAYER_VELOCITY, pointer);
+				this.player.rotation = this.game.physics.arcade.angleToPointer(this.player, pointer) + (Math.PI / 2);
 				this.transitionToState(ELevelState.FLYING);
 			}
 		}
@@ -253,8 +255,6 @@ module GameJam.Level {
 		}
 
 		render() {
-			this.numberOfTriesLeftText.x = this.game.camera.view.x;
-			this.numberOfTriesLeftText.y = this.game.camera.view.y;
 			if (this.levelState == ELevelState.STICKING) {
 				this.game.debug.geom(this.flightLine);
 			}
