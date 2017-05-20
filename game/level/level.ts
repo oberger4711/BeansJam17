@@ -61,8 +61,6 @@ module GameJam.Level {
 			// Parse tiles.
 			this.layerSpaceship = this.map.createLayer('Spaceship');
 			this.layerSpaceship.resizeWorld();
-			this.layerDarkness = this.map.createLayer('Darkness');
-			this.layerDarkness.resizeWorld();
 
 			this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -87,6 +85,8 @@ module GameJam.Level {
 			if (this.player == null) {
 				console.log("Error: Could not find object with type 'Player' in 'Objects'");
 			}
+			this.layerDarkness = this.map.createLayer('Darkness');
+			this.layerDarkness.resizeWorld();
 
 			// Init other stuff.
 			this.flightLine = new Phaser.Line();
@@ -246,7 +246,7 @@ module GameJam.Level {
 		}
 
 		updateNumberOfTriesLeftText() {
-			this.numberOfTriesLeftText.text = "Tries left: " + this.numberOfTriesLeft;
+			this.numberOfTriesLeftText.text = "Jumps left: " + this.numberOfTriesLeft;
 		}
 
 		switchToNextLevel() : void {
