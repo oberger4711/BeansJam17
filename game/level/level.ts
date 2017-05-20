@@ -52,12 +52,18 @@ module GameJam.Level {
 
 			this.flightLine = new Phaser.Line();
 
+			this.game.input.onDown.add(this.onDown, this);
+
 			//this.music = this.game.add.sound('music', 1, true);
 			//this.music.play();
 		}
 
 		createPlayer(x : number, y : number) : void {
 			this.player = this.game.add.sprite(x, y, 'player');
+			this.player.anchor.x = 0.5;
+			this.player.anchor.y = 0.5;
+			this.player.position.x += this.player.width / 2;
+			this.player.position.y += this.player.height / 2;
 			this.player.animations.add('fly', [0, 1], 100, true);
 			this.player.animations.add('stick', [2, 3], 100, true);
 			this.player.animations.play('fly');
@@ -67,30 +73,50 @@ module GameJam.Level {
 			this.levelState = ELevelState.FLYING;
 		}
 
+		onDown(pointer) {
+			if (this.levelState == ELevelState.STICKING) {
+				this.game.physics.arcade.moveToPointer(this.player, MAX_FLY_VELOCITY, pointer);
+				this.transitionToState(ELevelState.FLYING);
+			}
+		}
+
 		update() {
 			this.game.physics.arcade.collide(this.player, this.layerSpaceship, this.onPlayerCollidesWithSpaceShip, null, this);
 			if (this.levelState == ELevelState.STICKING) {
-				// TODO
+				// Update flight line.
+				this.flightLine.start = this.player.position;
+				this.flightLine.end = this.game.input.activePointer.position;
 			}
 		}
 
 		private onPlayerCollidesWithSpaceShip(player, spaceShipTile) {
-			console.log("Collision detected of player with spaceship tile " + spaceShipTile + ".");
+			console.log("Collision detected of player with spaceship tile of index " + spaceShipTile.index + ".");
 			this.transitionToState(ELevelState.STICKING);
 		}
 
 		private transitionToState(next : ELevelState) {
-			if (next == ELevelState.STICKING && this.levelState != ELevelState.STICKING) {
-				console.log("Transitioning to level state " + next + ".");
+			if (next == this.levelState) {
+				return;
+			}
+			console.log("Transitioning from level state " + ELevelState[this.levelState] + " to level state " + ELevelState[next] + ".");
+			if (next == ELevelState.STICKING) {
+				this.player.rotation = 0;
 				this.player.body.velocity.x = 0;
 				this.player.body.velocity.y = 0;
 				this.levelState = ELevelState.STICKING;
 				this.player.animations.play('stick');
 			}
+			if (next == ELevelState.FLYING) {
+				this.levelState = ELevelState.FLYING;
+				this.player.animations.play('fly');
+			}
 		}
 
 
 		render() {
+			if (this.levelState == ELevelState.STICKING) {
+				this.game.debug.geom(this.flightLine);
+			}
 			//this.game.debug.body(this.player);
 			//this.game.debug.body(this.layerSpaceship);
 		}
