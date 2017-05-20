@@ -33,6 +33,7 @@ module GameJam.Level {
 		private victims : Phaser.Group;
 		private containers : Phaser.Group;
 		private numberOfCaughtEnemies : number;
+		private retryKey : Phaser.Key;
 
 		private levelState : ELevelState;
 
@@ -80,7 +81,9 @@ module GameJam.Level {
 			this.numberOfCaughtEnemies = 0;
 
 			// Add event handlers.
-			this.game.input.onDown.add(this.onDown, this);
+			this.game.input.onDown.add(this.onClickDown, this);
+			this.retryKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+			this.retryKey.onDown.add(this.onRetryPressed, this);
 
 			//this.music = this.game.add.sound('music', 1, true);
 			//this.music.play();
@@ -130,11 +133,15 @@ module GameJam.Level {
 			this.game.physics.arcade.enable(container);
 		}
 
-		onDown(pointer) {
+		onClickDown(pointer) {
 			if (this.levelState == ELevelState.STICKING) {
 				this.game.physics.arcade.moveToPointer(this.player, PLAYER_VELOCITY, pointer);
 				this.transitionToState(ELevelState.FLYING);
 			}
+		}
+
+		onRetryPressed() {
+			this.game.state.start("level", true, false, this.mapIndex);
 		}
 
 		update() {
