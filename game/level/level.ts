@@ -12,7 +12,7 @@ module GameJam.Level {
 		STICKING
 	}
 
-	enum EEnemyType {
+	enum EVictimType {
 		HORIZONTAL,
 		VERTICAL
 	}
@@ -27,7 +27,7 @@ module GameJam.Level {
 		private layerObjects : Phaser.TilemapLayer;
 		private player : Phaser.Sprite;
 		private flightLine : Phaser.Line;
-		private enemies : Phaser.Group;
+		private victims : Phaser.Group;
 		private numberOfCaughtEnemies : number;
 
 		private levelState : ELevelState;
@@ -49,17 +49,17 @@ module GameJam.Level {
 			this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
 			// Parse objects.
-			this.enemies = this.game.add.group();
-			this.game.physics.arcade.enable(this.enemies);
+			this.victims = this.game.add.group();
+			this.game.physics.arcade.enable(this.victims);
 			for (let obj of this.map.objects['Object Layer 1']) {
 				if (obj.name == "Player") {
 					this.createPlayer(obj.x, obj.y);
 				}
-				else if (obj.name == "EnemyV") {
-					this.createEnemy(obj.x, obj.y, EEnemyType.VERTICAL);
+				else if (obj.name == "VictimV") {
+					this.createVictim(obj.x, obj.y, EVictimType.VERTICAL);
 				}
-				else if (obj.name == "EnemyH") {
-					this.createEnemy(obj.x, obj.y, EEnemyType.HORIZONTAL);
+				else if (obj.name == "VictimH") {
+					this.createVictim(obj.x, obj.y, EVictimType.HORIZONTAL);
 				}
 			}
 			if (this.player == null) {
@@ -92,21 +92,21 @@ module GameJam.Level {
 			this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_LOCKON, 0.1, 0.1);
 		}
 
-		createEnemy(x : number, y : number, type : EEnemyType) : void {
-			console.log("Creating enemy of type " + EEnemyType[type] + ".");
-			let enemy = this.enemies.create(x + TILE_WIDTH / 2, y + TILE_HEIGHT / 2, 'enemy');
-			enemy.anchor.x = 0.5;
-			enemy.anchor.y = 0.5;
-			enemy.animations.add('fly', [0, 1], 100, true);
-			enemy.animations.add('escape', [2, 3], 100, true);
-			enemy.animations.play('escape');
-			this.game.physics.arcade.enable(enemy);
-			enemy.body.bounce.set(1);
-			if (type == EEnemyType.HORIZONTAL) {
-				enemy.body.velocity.x = MAX_FLY_VELOCITY;
+		createVictim(x : number, y : number, type : EVictimType) : void {
+			console.log("Creating victim of type " + EVictimType[type] + ".");
+			let victim = this.victims.create(x + TILE_WIDTH / 2, y + TILE_HEIGHT / 2, 'victim');
+			victim.anchor.x = 0.5;
+			victim.anchor.y = 0.5;
+			victim.animations.add('fly', [0, 1], 100, true);
+			victim.animations.add('escape', [2, 3], 100, true);
+			victim.animations.play('escape');
+			this.game.physics.arcade.enable(victim);
+			victim.body.bounce.set(1);
+			if (type == EVictimType.HORIZONTAL) {
+				victim.body.velocity.x = MAX_FLY_VELOCITY;
 			}
 			else {
-				enemy.body.velocity.y = MAX_FLY_VELOCITY;
+				victim.body.velocity.y = MAX_FLY_VELOCITY;
 			}
 		}
 
@@ -119,8 +119,8 @@ module GameJam.Level {
 
 		update() {
 			this.game.physics.arcade.collide(this.player, this.layerSpaceship, this.onPlayerCollidesWithSpaceShip, null, this);
-			this.game.physics.arcade.collide(this.enemies, this.layerSpaceship, this.onEnemyCollidesWithSpaceShip, null, this);
-			this.game.physics.arcade.overlap(this.player, this.enemies, this.onPlayerOverlapsWithEnemy, null, this);
+			this.game.physics.arcade.collide(this.victims, this.layerSpaceship, this.onVictimCollidesWithSpaceShip, null, this);
+			this.game.physics.arcade.overlap(this.player, this.victims, this.onPlayerOverlapsWithVictim, null, this);
 			if (this.levelState == ELevelState.STICKING) {
 				// Update flight line.
 				this.flightLine.start = this.player.position;
@@ -128,7 +128,6 @@ module GameJam.Level {
 				//this.flightLine.start.y = this.player.position.y - this.game.camera.view.y;
 				this.flightLine.end.x = this.game.input.activePointer.position.x + this.game.camera.view.x;
 				this.flightLine.end.y = this.game.input.activePointer.position.y + this.game.camera.view.y;
-				console.log(this.game.input.activePointer.position);
 			}
 		}
 
@@ -137,12 +136,12 @@ module GameJam.Level {
 			this.transitionToState(ELevelState.STICKING);
 		}
 
-		private onEnemyCollidesWithSpaceShip(enemy, spaceShipTile) {
+		private onVictimCollidesWithSpaceShip(victim, spaceShipTile) {
 		}
 
-		private onPlayerOverlapsWithEnemy(player, enemy) {
+		private onPlayerOverlapsWithVictim(player, victim) {
 			if (this.levelState == ELevelState.FLYING) {
-				this.enemies.remove(enemy);
+				this.victims.remove(victim);
 				this.numberOfCaughtEnemies++;
 			}
 		}

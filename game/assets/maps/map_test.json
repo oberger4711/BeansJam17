@@ -30,7 +30,7 @@
                 {
                  "height":100,
                  "id":4,
-                 "name":"EnemyH",
+                 "name":"VictimH",
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -41,7 +41,7 @@
                 {
                  "height":100,
                  "id":5,
-                 "name":"EnemyH",
+                 "name":"VictimH",
                  "rotation":0,
                  "type":"",
                  "visible":true,
