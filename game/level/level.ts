@@ -109,7 +109,7 @@ module GameJam.Level {
 			this.player = this.game.add.sprite(x + TILE_WIDTH / 2, y + TILE_HEIGHT / 2, 'player');
 			this.player.anchor.x = 0.5;
 			this.player.anchor.y = 0.5;
-			this.player.animations.add('fly', [0], 100, true);
+			this.player.animations.add('fly', [0, 1, 2, 3, 4, 5, 6, 7], 100, true);
 			this.player.animations.add('stick', [1], 100, true);
 			this.player.animations.play('fly');
 			this.game.physics.arcade.enable(this.player);
@@ -193,8 +193,7 @@ module GameJam.Level {
 
 		private onPlayerOverlapsWithDarkness(player, darknessTile) {
 			// At least 50 % must intersect to be in darkness.
-			let intersection : Phaser.Rectangle = Phaser.Rectangle.intersection(player.getBounds(), new Phaser.Rectangle(darknessTile.worldX, darknessTile.worldY, darknessTile.width, darknessTile.height));
-			if (intersection.volume > 0.5 * (this.player.width * this.player.height)) {
+			if (Phaser.Rectangle.containsPoint(new Phaser.Rectangle(darknessTile.worldX - 10, darknessTile.worldY + 10, TILE_WIDTH + 20, TILE_HEIGHT + 20), this.player.position)) {
 				this.playerInDarkness = true;
 			}
 		}
