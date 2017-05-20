@@ -28,6 +28,7 @@ module GameJam.Level {
 		private player : Phaser.Sprite;
 		private flightLine : Phaser.Line;
 		private victims : Phaser.Group;
+		private containers : Phaser.Group;
 		private numberOfCaughtEnemies : number;
 
 		private levelState : ELevelState;
@@ -50,6 +51,7 @@ module GameJam.Level {
 
 			// Parse objects.
 			this.victims = this.game.add.group();
+			this.containers = this.game.add.group();
 			this.game.physics.arcade.enable(this.victims);
 			for (let obj of this.map.objects['Object Layer 1']) {
 				if (obj.name == "Player") {
@@ -60,6 +62,9 @@ module GameJam.Level {
 				}
 				else if (obj.name == "VictimH") {
 					this.createVictim(obj.x, obj.y, EVictimType.HORIZONTAL);
+				}
+				else if (obj.name == "Container") {
+					this.createContainer(obj.x, obj.y);
 				}
 			}
 			if (this.player == null) {
@@ -108,6 +113,12 @@ module GameJam.Level {
 			else {
 				victim.body.velocity.y = MAX_FLY_VELOCITY;
 			}
+		}
+
+		createContainer(x : number, y : number) : void {
+			console.log("Creating container.");
+			let container = this.containers.create(x + TILE_WIDTH / 2, y + TILE_HEIGHT / 2, 'container');
+			// TODO
 		}
 
 		onDown(pointer) {
