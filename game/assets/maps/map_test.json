@@ -20,6 +20,10 @@
                  "height":100,
                  "id":1,
                  "name":"Player",
+                 "properties":
+                    {
+
+                    },
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -31,6 +35,10 @@
                  "height":100,
                  "id":4,
                  "name":"VictimH",
+                 "properties":
+                    {
+
+                    },
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -40,8 +48,12 @@
                 }, 
                 {
                  "height":100,
-                 "id":5,
-                 "name":"VictimH",
+                 "id":6,
+                 "name":"Container",
+                 "properties":
+                    {
+
+                    },
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -56,19 +68,26 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":6,
+ "nextobjectid":8,
  "orientation":"orthogonal",
+ "properties":
+    {
+
+    },
  "renderorder":"right-down",
  "tileheight":100,
  "tilesets":[
         {
-         "columns":1,
          "firstgid":1,
          "image":"tiles\/tiles.png",
          "imageheight":100,
          "imagewidth":100,
          "margin":0,
          "name":"tiles",
+         "properties":
+            {
+
+            },
          "spacing":0,
          "tilecount":1,
          "tileheight":100,

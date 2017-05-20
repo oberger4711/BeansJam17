@@ -3,13 +3,15 @@
 module GameJam.Level {
 
 	const LEVEL_MAP_LIST : string[] = ['map_test'];
-	const MAX_FLY_VELOCITY : number = 200;
+	const PLAYER_VELOCITY : number = 200;
+	const VICTIM_VELOCITY : number = 150;
 	const TILE_WIDTH : number = 100;
 	const TILE_HEIGHT : number = TILE_WIDTH;
 
 	enum ELevelState {
 		FLYING,
-		STICKING
+		STICKING,
+		WON
 	}
 
 	enum EVictimType {
@@ -21,6 +23,7 @@ module GameJam.Level {
 
 		private music : Phaser.Sound;
 
+		private mapIndex : number;
 		private mapName : string;
 		private map : Phaser.Tilemap;
 		private layerSpaceship : Phaser.TilemapLayer;
@@ -34,6 +37,7 @@ module GameJam.Level {
 		private levelState : ELevelState;
 
 		init(index : number) {
+			this.mapIndex = index;
 			this.mapName = LEVEL_MAP_LIST[index];
 			console.log("Initialized level " + this.mapName + ".");
 		}
@@ -91,7 +95,7 @@ module GameJam.Level {
 			this.player.animations.add('stick', [2, 3], 100, true);
 			this.player.animations.play('fly');
 			this.game.physics.arcade.enable(this.player);
-			this.player.body.velocity.x = -MAX_FLY_VELOCITY;
+			this.player.body.velocity.x = -PLAYER_VELOCITY;
 			this.player.body.velocity.y = 0;
 			this.levelState = ELevelState.FLYING;
 			this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_LOCKON, 0.1, 0.1);
@@ -108,37 +112,45 @@ module GameJam.Level {
 			this.game.physics.arcade.enable(victim);
 			victim.body.bounce.set(1);
 			if (type == EVictimType.HORIZONTAL) {
-				victim.body.velocity.x = MAX_FLY_VELOCITY;
+				victim.body.velocity.x = VICTIM_VELOCITY;
 			}
 			else {
-				victim.body.velocity.y = MAX_FLY_VELOCITY;
+				victim.body.velocity.y = PLAYER_VELOCITY;
 			}
 		}
 
 		createContainer(x : number, y : number) : void {
 			console.log("Creating container.");
 			let container = this.containers.create(x + TILE_WIDTH / 2, y + TILE_HEIGHT / 2, 'container');
-			// TODO
+			container.anchor.x = 0.5;
+			container.anchor.y = 0.5;
+			container.animations.add('still', [0], 1, false);
+			container.animations.add('fight', [2, 3], 200, true);
+			container.animations.play('still');
+			this.game.physics.arcade.enable(container);
 		}
 
 		onDown(pointer) {
 			if (this.levelState == ELevelState.STICKING) {
-				this.game.physics.arcade.moveToPointer(this.player, MAX_FLY_VELOCITY, pointer);
+				this.game.physics.arcade.moveToPointer(this.player, PLAYER_VELOCITY, pointer);
 				this.transitionToState(ELevelState.FLYING);
 			}
 		}
 
 		update() {
-			this.game.physics.arcade.collide(this.player, this.layerSpaceship, this.onPlayerCollidesWithSpaceShip, null, this);
-			this.game.physics.arcade.collide(this.victims, this.layerSpaceship, this.onVictimCollidesWithSpaceShip, null, this);
-			this.game.physics.arcade.overlap(this.player, this.victims, this.onPlayerOverlapsWithVictim, null, this);
-			if (this.levelState == ELevelState.STICKING) {
-				// Update flight line.
-				this.flightLine.start = this.player.position;
-				//this.flightLine.start.x = this.player.position.x - this.game.camera.view.x;
-				//this.flightLine.start.y = this.player.position.y - this.game.camera.view.y;
-				this.flightLine.end.x = this.game.input.activePointer.position.x + this.game.camera.view.x;
-				this.flightLine.end.y = this.game.input.activePointer.position.y + this.game.camera.view.y;
+			if (this.levelState != ELevelState.WON) {
+				this.game.physics.arcade.collide(this.player, this.layerSpaceship, this.onPlayerCollidesWithSpaceShip, null, this);
+				this.game.physics.arcade.collide(this.victims, this.layerSpaceship, this.onVictimCollidesWithSpaceShip, null, this);
+				this.game.physics.arcade.overlap(this.player, this.victims, this.onPlayerOverlapsWithVictim, null, this);
+				this.game.physics.arcade.overlap(this.player, this.containers, this.onPlayerOverlapsWithContainer, null, this);
+				if (this.levelState == ELevelState.STICKING) {
+					// Update flight line.
+					this.flightLine.start = this.player.position;
+					//this.flightLine.start.x = this.player.position.x - this.game.camera.view.x;
+					//this.flightLine.start.y = this.player.position.y - this.game.camera.view.y;
+					this.flightLine.end.x = this.game.input.activePointer.position.x + this.game.camera.view.x;
+					this.flightLine.end.y = this.game.input.activePointer.position.y + this.game.camera.view.y;
+				}
 			}
 		}
 
@@ -157,6 +169,14 @@ module GameJam.Level {
 			}
 		}
 
+		private onPlayerOverlapsWithContainer(player, container) {
+			if (this.levelState == ELevelState.FLYING && this.victims.total == 0) {
+				// Caught all victims.
+				container.animations.play('fight');
+				this.transitionToState(ELevelState.WON);
+			}
+		}
+
 		private transitionToState(next : ELevelState) {
 			if (next == this.levelState) {
 				return;
@@ -166,15 +186,22 @@ module GameJam.Level {
 				this.player.rotation = 0;
 				this.player.body.velocity.x = 0;
 				this.player.body.velocity.y = 0;
-				this.levelState = ELevelState.STICKING;
 				this.player.animations.play('stick');
 			}
 			if (next == ELevelState.FLYING) {
-				this.levelState = ELevelState.FLYING;
 				this.player.animations.play('fly');
 			}
+			if (next == ELevelState.WON) {
+				this.player.destroy();
+				this.game.time.events.add(2000, this.switchToNextLevel, this);
+			}
+			this.levelState = next;
 		}
 
+		switchToNextLevel() : void {
+			let nextLevelIndex : number = (this.mapIndex + 1) % LEVEL_MAP_LIST.length;
+			this.game.state.start("level", true, false, nextLevelIndex);
+		}
 
 		render() {
 			if (this.levelState == ELevelState.STICKING) {
