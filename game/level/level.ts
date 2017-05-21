@@ -170,7 +170,9 @@ module GameJam.Level {
 			container.anchor.x = 0.5;
 			container.anchor.y = 0.5;
 			container.animations.add('still', [0], 1, false);
-			container.animations.add('fight', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0], 10, false);
+			var fightAnim = container.animations.add('fight', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 10, false);
+			fightAnim.onComplete.add((s, a) => {s.animations.play('shake');}, this);
+			container.animations.add('shake', [10, 11, 12, 13, 14, 15], 4, true);
 			container.animations.play('still');
 			this.game.physics.arcade.enable(container);
 		}
@@ -417,7 +419,7 @@ module GameJam.Level {
 			}
 			if (next == ELevelState.WON) {
 				this.player.exists = false;
-				this.game.time.events.add(2000, this.switchToNextLevel, this);
+				this.game.time.events.add(3000, this.switchToNextLevel, this);
 			}
 			if (next == ELevelState.LOST) {
 				this.player.body.velocity.x = 0;
