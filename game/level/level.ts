@@ -8,13 +8,11 @@ module GameJam.Level {
 	const VICTIM_VELOCITY : number = 150;
 	const TILE_WIDTH : number = 100;
 	const TILE_HEIGHT : number = TILE_WIDTH;
-	const TILE_INDEX_START_GRIPPY : number = 1;
-	const TILE_INDEX_END_GRIPPY : number = 18;
+	const TILE_INDEX_START_SOLID : number = 1;
+	const TILE_INDEX_END_SOLID : number = 18;
 	const TILE_INDEX_START_DEADLY : number = 23;
 	const TILE_INDEX_END_DEADLY : number = 40;
-	const TILE_INDEX_START_BOUNCE : number = 100;
-	const TILE_INDEX_END_BOUNCE : number = 100;
-	const TILE_INDEX_DARKNESS : number = 24;
+	const TILE_INDEX_DARKNESS : number = 51;
 
 	enum ELevelState {
 		FLYING,
@@ -66,9 +64,8 @@ module GameJam.Level {
 			this.map = this.game.add.tilemap(this.mapName);
 			this.map.addTilesetImage('tiles');
 			this.map.addTilesetImage('darkness');
-			this.map.setCollisionBetween(TILE_INDEX_START_GRIPPY, TILE_INDEX_END_GRIPPY);
+			this.map.setCollisionBetween(TILE_INDEX_START_SOLID, TILE_INDEX_END_SOLID);
 			this.map.setCollisionBetween(TILE_INDEX_START_DEADLY, TILE_INDEX_END_DEADLY);
-			this.map.setCollisionBetween(TILE_INDEX_START_BOUNCE, TILE_INDEX_END_BOUNCE);
 			this.map.setCollisionBetween(TILE_INDEX_DARKNESS, TILE_INDEX_DARKNESS);
 
 			// Create visible stuff.
@@ -107,6 +104,7 @@ module GameJam.Level {
 			this.layerDarkness.resizeWorld();
 
 			// Init other stuff.
+			this.playerInDarkness = false;
 			this.flightLine = new Phaser.Line();
 			this.numberOfCaughtEnemies = 0;
 			this.textStyle = { font: "bold 32px Arial", fill: "#ff0000", boundsAlignH: "center", boundsAlignV: "middle" };
@@ -206,16 +204,16 @@ module GameJam.Level {
 
 		private onPlayerCollidesWithSpaceShip(player, spaceShipTile) {
 			console.log("Collision detected of player with spaceship tile of index " + spaceShipTile.index + ".");
-			if (this.shouldDieFromSpaceShipTile(spaceShipTile)) {
+			let playerInDarkness : boolean = this.checkInDarkness();
+			console.log("In Darkness : " + playerInDarkness);
+			if (this.isTileDeadly(spaceShipTile)) {
+				// Get grilled.
 				this.player.animations.play('grilled');
 				this.transitionToState(ELevelState.LOST);
 			}
-			else if (this.shouldStickToSpaceShipTile(spaceShipTile)) {
-				// Sticky tile
-				this.playerInDarkness = false;
-				this.game.physics.arcade.overlap(this.player, this.layerDarkness, this.onPlayerOverlapsWithDarkness, null, this);
-				console.log("In Darkness : " + this.playerInDarkness);
-				if (this.numberOfTriesLeft > 0 && this.playerInDarkness) {
+			else if (playerInDarkness) {
+				// Stick to wall.
+				if (this.numberOfTriesLeft > 0) {
 					// Rotate sprite to head away from the tile.
 					let diff : Phaser.Point = Phaser.Point.subtract(new Phaser.Point(spaceShipTile.worldX + TILE_WIDTH / 2, spaceShipTile.worldY + TILE_HEIGHT / 2), this.player.position);
 					this.player.body.angularVelocity = 0;
@@ -246,25 +244,32 @@ module GameJam.Level {
 				}
 			}
 			else {
-				// Bouncy tile
+				// Bounce from wall.
 				this.player.body.angularVelocity = -500;
 				this.player.animations.play('bounce');
 			}
 		}
 
-		private shouldDieFromSpaceShipTile(spaceShipTile) : boolean {
+		private checkInDarkness() : boolean {
+			this.playerInDarkness = false;
+			this.game.physics.arcade.overlap(this.player, this.layerDarkness, (p, darknessTile) => {
+				if (darknessTile.index != TILE_INDEX_DARKNESS) {
+					return;
+				}
+				// At least 50 % must intersect to be in darkness.
+				if (Phaser.Rectangle.containsPoint(new Phaser.Rectangle(darknessTile.worldX - 10, darknessTile.worldY - 10, TILE_WIDTH + 20, TILE_HEIGHT + 20), this.player.position)) {
+					this.playerInDarkness = true;
+				}
+				else {
+					console.log('nope: ');
+				}
+			}, null, this);
+
+			return this.playerInDarkness;
+		}
+
+		private isTileDeadly(spaceShipTile) : boolean {
 			return TILE_INDEX_START_DEADLY <= spaceShipTile.index && spaceShipTile.index <= TILE_INDEX_END_DEADLY;
-		}
-
-		private shouldStickToSpaceShipTile(spaceShipTile) : boolean {
-			return TILE_INDEX_START_GRIPPY <= spaceShipTile.index && spaceShipTile.index <= TILE_INDEX_END_GRIPPY;
-		}
-
-		private onPlayerOverlapsWithDarkness(player, darknessTile) {
-			// At least 50 % must intersect to be in darkness.
-			if (Phaser.Rectangle.containsPoint(new Phaser.Rectangle(darknessTile.worldX - 10, darknessTile.worldY + 10, TILE_WIDTH + 20, TILE_HEIGHT + 20), this.player.position)) {
-				this.playerInDarkness = true;
-			}
 		}
 
 		private onVictimCollidesWithSpaceShip(victim, spaceShipTile) {
