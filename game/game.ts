@@ -1,5 +1,6 @@
 /// <reference path="phaser.d.ts"/>
 /// <reference path="preload/preload.ts"/>
+/// <reference path="title/title.ts"/>
 /// <reference path="level/level.ts"/>
 
 module GameJam {

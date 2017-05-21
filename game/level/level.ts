@@ -40,6 +40,7 @@ module GameJam.Level {
 		private layerObjects : Phaser.TilemapLayer;
 		private player : Phaser.Sprite;
 		private flightLine : Phaser.Line;
+		private ui : Phaser.Group;
 		private victims : Phaser.Group;
 		private deadVictims : Phaser.Sprite[];
 		private containers : Phaser.Group;
@@ -82,12 +83,9 @@ module GameJam.Level {
 
 			// Parse objects.
 			this.victims = this.game.add.group();
+			this.game.physics.arcade.enable(this.victims);
 			this.deadVictims = [];
 			this.containers = this.game.add.group();
-			this.speechBubble = this.game.add.sprite(0, 0, 'speechbubble');
-			this.speechBubble.anchor.x = 1;
-			this.speechBubble.anchor.y = 1;
-			this.game.physics.arcade.enable(this.victims);
 			for (let obj of this.map.objects['Objects']) {
 				if (obj.name == "Player") {
 					this.createPlayer(obj.x, obj.y);
@@ -106,7 +104,7 @@ module GameJam.Level {
 				console.log("Error: Could not find object with type 'Player' in 'Objects'");
 			}
 			this.layerDarkness = this.map.createLayer('Darkness');
-			this.layerDarkness.resizeWorld();
+			this.ui = this.game.add.group();
 
 			// Init other stuff.
 			this.shouldDie = false;
@@ -385,11 +383,11 @@ module GameJam.Level {
 				// Caught all victims.
 				this.goalContainer = container;
 				container.animations.play('fight');
-				this.speechBubble.x = container.worldX;
-				this.speechBubble.y = container.worldY;
-				this.game.time.events.add(200, () => {
-				}, this);
+				this.speechBubble = this.ui.create(container.x, container.y, 'speechbubble');
+				this.speechBubble.anchor.x = 1;
+				this.speechBubble.anchor.y = 1;
 				this.speechBubble.alpha = 0;
+				let scale : Phaser.Tween = this.game.add.tween(this.speechBubble.scale).to( { x : 1.6, y: 1.2 }, 300, "Linear", true, 0, 999, true);
 				let fadeIn : Phaser.Tween = this.game.add.tween(this.speechBubble).to( { alpha: 1 }, 300, "Linear", true, 300, 0, false);
 				let fadeOut : Phaser.Tween = this.game.add.tween(this.speechBubble).to( { alpha: 0 }, 300, "Linear", false, 1000, 0, false);
 				fadeIn.chain(fadeOut);
