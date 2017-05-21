@@ -137,6 +137,7 @@ module GameJam.Level {
 			this.player.animations.add('stick', [8], 1, true);
 			this.player.animations.add('bounce', [9], 1, true);
 			this.player.animations.add('grilled', [10, 15], 10, true);
+			this.player.animations.add('exhausted', [18], 1, false);
 			this.player.animations.play('fly');
 			this.game.physics.arcade.enable(this.player);
 			this.player.body.velocity.x = -PLAYER_VELOCITY;
@@ -335,6 +336,9 @@ module GameJam.Level {
 					this.transitionToState(ELevelState.STICKING);
 				}
 				else {
+					this.player.rotation = 0;
+					this.player.animations.play('exhausted');
+					this.game.add.tween(this.player).to( { alpha: 0 }, 1000, "Linear", true, 1000, 0, false);
 					this.transitionToState(ELevelState.LOST);
 				}
 			}
