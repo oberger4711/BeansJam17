@@ -393,10 +393,12 @@ module GameJam.Level {
 				this.goalContainer = container;
 				container.animations.play('fight');
 				this.speechBubble = this.ui.create(container.x, container.y, 'speechbubble');
+				this.speechBubble.scale.x = 0.5;
+				this.speechBubble.scale.y = 0.5;
 				this.speechBubble.anchor.x = 1;
 				this.speechBubble.anchor.y = 1;
 				this.speechBubble.alpha = 0;
-				let scale : Phaser.Tween = this.game.add.tween(this.speechBubble.scale).to( { x : 1.6, y: 1.2 }, 300, "Linear", true, 0, 999, true);
+				let scale : Phaser.Tween = this.game.add.tween(this.speechBubble.scale).to( { x : 0.9, y: 0.7 }, 300, "Linear", true, 0, 999, true);
 				let fadeIn : Phaser.Tween = this.game.add.tween(this.speechBubble).to( { alpha: 1 }, 300, "Linear", true, 300, 0, false);
 				let fadeOut : Phaser.Tween = this.game.add.tween(this.speechBubble).to( { alpha: 0 }, 300, "Linear", false, 1000, 0, false);
 				fadeIn.chain(fadeOut);
