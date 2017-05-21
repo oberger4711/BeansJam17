@@ -43,6 +43,7 @@ module GameJam.Level {
 		private numberOfTriesLeft : number;
 		private numberOfCaughtEnemies : number;
 		private playerInDarkness : boolean;
+		private stickyRotation : number;
 		private retryKey : Phaser.Key;
 		private textStyle;
 		private numberOfTriesLeftText : Phaser.Text;
@@ -170,6 +171,9 @@ module GameJam.Level {
 		}
 
 		update() {
+			if (this.levelState == ELevelState.STICKING) {
+				this.player.rotation = this.stickyRotation;
+			}
 			if (this.levelState != ELevelState.WON && this.levelState != ELevelState.LOST) {
 				this.game.physics.arcade.collide(this.player, this.layerSpaceship, this.onPlayerCollidesWithSpaceShip, null, this);
 			}
@@ -198,29 +202,27 @@ module GameJam.Level {
 				if (this.numberOfTriesLeft > 0 && this.playerInDarkness) {
 					// Rotate sprite to head away from the tile.
 					let diff : Phaser.Point = Phaser.Point.subtract(new Phaser.Point(spaceShipTile.worldX + TILE_WIDTH / 2, spaceShipTile.worldY + TILE_HEIGHT / 2), this.player.position);
-					this.player.body.moves = false;
 					this.player.body.angularVelocity = 0;
 					if (Math.abs(diff.x) > Math.abs(diff.y)) {
 						if (diff.x > 0) {
 							// From right
-							this.player.rotation = -Math.PI / 2;
+							this.stickyRotation = -Math.PI / 2;
 						}
 						else {
 							// From left
-							this.player.rotation = Math.PI / 2;
+							this.stickyRotation = Math.PI / 2;
 						}
 					}
 					else {
 						if (diff.y > 0) {
 							// From top
-							this.player.rotation = 0;
+							this.stickyRotation = 0;
 						}
 						else {
 							// From bottom
-							this.player.rotation = Math.PI;
+							this.stickyRotation = Math.PI;
 						}
 					}
-					this.player.body.moves = true;
 					this.transitionToState(ELevelState.STICKING);
 				}
 				else {
