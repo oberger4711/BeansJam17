@@ -14,6 +14,7 @@ module GameJam.Preload {
 			this.game.load.image('cover', 'assets/misc/cover.png');
 			this.game.load.image('instructions0', 'assets/misc/instructions0.png');
 			this.game.load.image('instructions1', 'assets/misc/instructions1.png');
+			this.game.load.image('won', 'assets/misc/won.png');
 
 			// Spritesheets
 			this.game.load.spritesheet('player', 'assets/spritesheets/player.png', 64, 64);

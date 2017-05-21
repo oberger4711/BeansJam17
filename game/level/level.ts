@@ -448,8 +448,13 @@ module GameJam.Level {
 		}
 
 		switchToNextLevel() : void {
-			let nextLevelIndex : number = (this.mapIndex + 1) % LEVEL_MAP_LIST.length;
-			this.game.state.start("level", true, false, nextLevelIndex);
+			let nextLevelIndex : number = this.mapIndex + 1;
+			if (nextLevelIndex == LEVEL_MAP_LIST.length) {
+				this.game.state.start('won', true, false);
+			}
+			else {
+				this.game.state.start("level", true, false, nextLevelIndex);
+			}
 		}
 
 		render() {
