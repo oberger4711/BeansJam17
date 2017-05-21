@@ -41,7 +41,9 @@ module GameJam.Level {
 		private player : Phaser.Sprite;
 		private flightLine : Phaser.Line;
 		private victims : Phaser.Group;
+		private deadVictims : Phaser.Sprite[];
 		private containers : Phaser.Group;
+		private goalContainer : Phaser.Sprite;
 		private speechBubble : Phaser.Sprite;
 		private numberOfTriesLeft : number;
 		private numberOfCaughtEnemies : number;
@@ -80,6 +82,7 @@ module GameJam.Level {
 
 			// Parse objects.
 			this.victims = this.game.add.group();
+			this.deadVictims = [];
 			this.containers = this.game.add.group();
 			this.speechBubble = this.game.add.sprite(0, 0, 'speechbubble');
 			this.speechBubble.anchor.x = 1;
@@ -147,8 +150,9 @@ module GameJam.Level {
 			let victim = this.victims.create(x + TILE_WIDTH / 2, y + TILE_HEIGHT / 2, 'victim');
 			victim.anchor.x = 0.5;
 			victim.anchor.y = 0.5;
-			victim.animations.add('fly', [0], 1, true);
+			victim.animations.add('fly', [0], 1, false);
 			victim.animations.add('escape', [0, 1, 2, 3, 4, 5, 6, 7, 8], 10, true);
+			victim.animations.add('caught', [9], 1, false);
 			victim.animations.play('fly');
 			this.game.physics.arcade.enable(victim);
 			victim.body.bounce.set(1);
@@ -186,6 +190,7 @@ module GameJam.Level {
 		}
 
 		update() {
+			this.updateDeadVictims();
 			if (this.levelState == ELevelState.STICKING) {
 				this.player.rotation = this.stickyRotation;
 			}
@@ -194,6 +199,12 @@ module GameJam.Level {
 			}
 			else {
 				this.resetVictimAnimations();
+			}
+			if (this.levelState == ELevelState.WON) {
+				// Remove victims when touching container.
+				this.game.physics.arcade.overlap(this.victims, this.containers, (v, c) => {
+					v.exists = false;
+				}, null, this);
 			}
 			if (this.levelState != ELevelState.WON && this.levelState != ELevelState.LOST) {
 				this.shouldDie = false;
@@ -227,6 +238,26 @@ module GameJam.Level {
 				v.animations.play('fly');
 				this.faceVictimToItsDirection(v);
 			}, this);
+		}
+
+		private updateDeadVictims() {
+			let time : number = 500;
+			var dest = this.player;
+			if (this.levelState == ELevelState.WON) {
+				dest = this.goalContainer;
+			}
+			if (this.deadVictims.length > 0) {
+				this.game.physics.arcade.moveToObject(this.deadVictims[0], dest, 60, time);
+				this.deadVictims[0].rotation = this.game.physics.arcade.angleBetween(this.deadVictims[0], dest);
+				for (let i : number = 1; i < this.deadVictims.length; i++) {
+					var nextDest = this.deadVictims[i - 1];
+					if (this.levelState == ELevelState.WON) {
+						nextDest = dest;
+					}
+					this.game.physics.arcade.moveToObject(this.deadVictims[i], nextDest, 60, time);
+					this.deadVictims[i].rotation = this.game.physics.arcade.angleBetween(this.deadVictims[i], nextDest);
+				}
+			}
 		}
 
 		private updateVictimAnimations() {
@@ -337,15 +368,22 @@ module GameJam.Level {
 		}
 
 		private onPlayerOverlapsWithVictim(player, victim) {
-			if (this.levelState == ELevelState.FLYING) {
-				victim.alive = false;
-				this.numberOfCaughtEnemies++;
+			if (victim.alive == true) {
+				if (this.levelState == ELevelState.FLYING) {
+					victim.alive = false;
+					victim.animations.play('caught');
+					victim.scale.y = 1;
+					victim.scale.x = 1;
+					this.deadVictims.push(victim);
+					this.numberOfCaughtEnemies++;
+				}
 			}
 		}
 
 		private onPlayerOverlapsWithContainer(player, container) {
-			if (this.levelState == ELevelState.FLYING && this.victims.total == 0) {
+			if (this.levelState == ELevelState.FLYING && this.victims.total == this.deadVictims.length) {
 				// Caught all victims.
+				this.goalContainer = container;
 				container.animations.play('fight');
 				this.speechBubble.x = container.worldX;
 				this.speechBubble.y = container.worldY;
