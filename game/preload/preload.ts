@@ -13,7 +13,7 @@ module GameJam.Preload {
 
 			// Spritesheets
 			this.game.load.spritesheet('player', 'assets/spritesheets/player.png', 64, 64);
-			this.game.load.spritesheet('victim', 'assets/spritesheets/victim.png', 32, 64);
+			this.game.load.spritesheet('victim', 'assets/spritesheets/victim.png', 64, 64);
 			this.game.load.spritesheet('container', 'assets/spritesheets/container.png', 100, 100);
 
 			// Maps

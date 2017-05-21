@@ -146,16 +146,18 @@ module GameJam.Level {
 			let victim = this.victims.create(x + TILE_WIDTH / 2, y + TILE_HEIGHT / 2, 'victim');
 			victim.anchor.x = 0.5;
 			victim.anchor.y = 0.5;
-			victim.animations.add('fly', [0, 1], 100, true);
-			victim.animations.add('escape', [2, 3], 100, true);
-			victim.animations.play('escape');
+			victim.animations.add('fly', [0], 1, true);
+			victim.animations.add('escape', [0, 1, 2, 3, 4, 5, 6, 7, 8], 10, true);
+			victim.animations.play('fly');
 			this.game.physics.arcade.enable(victim);
 			victim.body.bounce.set(1);
 			if (type == EVictimType.HORIZONTAL) {
+				victim.rotation = Math.PI / 2;
 				victim.body.velocity.x = VICTIM_VELOCITY;
 			}
 			else {
-				victim.body.velocity.y = PLAYER_VELOCITY;
+				victim.rotation = Math.PI;
+				victim.body.velocity.y = VICTIM_VELOCITY;
 			}
 		}
 
@@ -279,6 +281,8 @@ module GameJam.Level {
 		}
 
 		private onVictimCollidesWithSpaceShip(victim, spaceShipTile) {
+			victim.scale.x *= -1;
+			victim.scale.y *= -1;
 		}
 
 		private onPlayerOverlapsWithVictim(player, victim) {

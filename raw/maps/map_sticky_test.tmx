@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="30" height="10" tilewidth="100" tileheight="100" nextobjectid="9">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="30" height="10" tilewidth="100" tileheight="100" nextobjectid="14">
  <tileset firstgid="1" name="tiles" tilewidth="100" tileheight="100" tilecount="50">
   <image source="../../game/assets/maps/tiles/tiles.png" width="5021" height="100"/>
   <terraintypes>
@@ -64,5 +64,7 @@
  <objectgroup name="Objects">
   <object id="1" name="Player" x="200" y="300" width="100" height="100"/>
   <object id="6" name="Container" x="800" y="700" width="100" height="100"/>
+  <object id="9" name="VictimV" x="400" y="400" width="100" height="100"/>
+  <object id="11" name="VictimH" x="500" y="600" width="100" height="100"/>
  </objectgroup>
 </map>

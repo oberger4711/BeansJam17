@@ -56,6 +56,36 @@
                  "width":100,
                  "x":800,
                  "y":700
+                }, 
+                {
+                 "height":100,
+                 "id":9,
+                 "name":"VictimV",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":100,
+                 "x":400,
+                 "y":400
+                }, 
+                {
+                 "height":100,
+                 "id":11,
+                 "name":"VictimH",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":100,
+                 "x":500,
+                 "y":600
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -64,7 +94,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":9,
+ "nextobjectid":14,
  "orientation":"orthogonal",
  "properties":
     {
