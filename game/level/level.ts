@@ -2,8 +2,8 @@
 
 module GameJam.Level {
 
-	const LEVEL_MAP_LIST : string[] = ['map_sticky_test'];
-	const NUMBER_OF_TRIES_MAP_LIST : number[] = [5];
+	const LEVEL_MAP_LIST : string[] = ['map1', 'map2', 'map3', 'map4', 'map5'];
+	const NUMBER_OF_TRIES_MAP_LIST : number[] = [3, 3, 3, 3, 1];
 	const PLAYER_VELOCITY : number = 300;
 	const VICTIM_VELOCITY : number = 150;
 	const TILE_WIDTH : number = 100;
@@ -57,6 +57,8 @@ module GameJam.Level {
 		private levelState : ELevelState;
 
 		init(index : number) {
+			// TODO: Remove the following line.
+			index = LEVEL_MAP_LIST.length - 1;
 			this.mapIndex = index;
 			this.mapName = LEVEL_MAP_LIST[index];
 			this.numberOfTriesLeft = NUMBER_OF_TRIES_MAP_LIST[index];
@@ -176,7 +178,7 @@ module GameJam.Level {
 			container.animations.add('still', [0], 1, false);
 			var fightAnim = container.animations.add('fight', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 10, false);
 			fightAnim.onComplete.add((s, a) => {s.animations.play('shake');}, this);
-			container.animations.add('shake', [10, 11, 12, 13, 14, 15], 4, true);
+			container.animations.add('shake', [10, 11, 12, 13, 14, 15], 8, true);
 			container.animations.play('still');
 			this.game.physics.arcade.enable(container);
 		}
