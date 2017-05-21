@@ -111,7 +111,7 @@ module GameJam.Level {
 			this.playerInDarkness = false;
 			this.flightLine = new Phaser.Line();
 			this.numberOfCaughtEnemies = 0;
-			this.textStyle = { font: "bold 32px Arial", fill: "#ff0000", boundsAlignH: "center", boundsAlignV: "middle" };
+			this.textStyle = { font: 'bold 32px "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", "Helvetica", "Arial"', fill: "#ff0000", boundsAlignH: "center", boundsAlignV: "middle" };
 			this.numberOfTriesLeftText = this.game.add.text(0, 0, "", this.textStyle);
 			this.numberOfTriesLeftText.fixedToCamera = true;
 			this.updateNumberOfTriesLeftText();
