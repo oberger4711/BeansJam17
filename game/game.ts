@@ -10,6 +10,7 @@ module GameJam {
 			super(1200, 800, Phaser.CANVAS, 'content', undefined, undefined, false);
 
 			this.state.add("preload", Preload.Preload);
+			this.state.add("title", Title.Title);
 			this.state.add("level", Level.Level);
 
 			this.state.start("preload");
