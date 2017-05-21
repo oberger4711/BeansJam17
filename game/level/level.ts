@@ -45,6 +45,7 @@ module GameJam.Level {
 		private numberOfTriesLeft : number;
 		private numberOfCaughtEnemies : number;
 		private playerInDarkness : boolean;
+		private shouldDie : boolean;
 		private stickyRotation : number;
 		private retryKey : Phaser.Key;
 		private textStyle;
@@ -64,8 +65,8 @@ module GameJam.Level {
 			this.map = this.game.add.tilemap(this.mapName);
 			this.map.addTilesetImage('tiles');
 			this.map.addTilesetImage('darkness');
-			this.map.setCollisionBetween(TILE_INDEX_START_SOLID, TILE_INDEX_END_SOLID);
 			this.map.setCollisionBetween(TILE_INDEX_START_DEADLY, TILE_INDEX_END_DEADLY);
+			this.map.setCollisionBetween(TILE_INDEX_START_SOLID, TILE_INDEX_END_SOLID);
 			this.map.setCollisionBetween(TILE_INDEX_DARKNESS, TILE_INDEX_DARKNESS);
 
 			// Create visible stuff.
@@ -104,6 +105,7 @@ module GameJam.Level {
 			this.layerDarkness.resizeWorld();
 
 			// Init other stuff.
+			this.shouldDie = false;
 			this.playerInDarkness = false;
 			this.flightLine = new Phaser.Line();
 			this.numberOfCaughtEnemies = 0;
@@ -185,7 +187,16 @@ module GameJam.Level {
 				this.player.rotation = this.stickyRotation;
 			}
 			if (this.levelState != ELevelState.WON && this.levelState != ELevelState.LOST) {
-				this.game.physics.arcade.collide(this.player, this.layerSpaceship, this.onPlayerCollidesWithSpaceShip, null, this);
+				this.shouldDie = false;
+				this.game.physics.arcade.overlap(this.player, this.layerSpaceship, (p, tile) => { if (this.isTileDeadly(tile)) { this.shouldDie = true }}, null, this);
+				if (this.shouldDie) {
+					// Get grilled.
+					this.player.animations.play('grilled');
+					this.transitionToState(ELevelState.LOST);
+				}
+				else {
+					this.game.physics.arcade.collide(this.player, this.layerSpaceship, this.onPlayerCollidesWithSpaceShip, null, this);
+				}
 			}
 			this.game.physics.arcade.collide(this.victims, this.layerSpaceship, this.onVictimCollidesWithSpaceShip, null, this);
 			if (this.levelState != ELevelState.WON && this.levelState != ELevelState.LOST) {
@@ -206,12 +217,7 @@ module GameJam.Level {
 			console.log("Collision detected of player with spaceship tile of index " + spaceShipTile.index + ".");
 			let playerInDarkness : boolean = this.checkInDarkness();
 			console.log("In Darkness : " + playerInDarkness);
-			if (this.isTileDeadly(spaceShipTile)) {
-				// Get grilled.
-				this.player.animations.play('grilled');
-				this.transitionToState(ELevelState.LOST);
-			}
-			else if (playerInDarkness) {
+			if (playerInDarkness) {
 				// Stick to wall.
 				if (this.numberOfTriesLeft > 0) {
 					// Rotate sprite to head away from the tile.
