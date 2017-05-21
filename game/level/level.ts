@@ -30,7 +30,6 @@ module GameJam.Level {
 	export class Level extends Phaser.State {
 
 		private background : Phaser.Sprite;
-		private music : Phaser.Sound;
 
 		private mapIndex : number;
 		private mapName : string;
@@ -123,9 +122,6 @@ module GameJam.Level {
 			this.game.input.onDown.add(this.onClickDown, this);
 			this.retryKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 			this.retryKey.onDown.add(this.retry, this);
-
-			//this.music = this.game.add.sound('music', 1, true);
-			//this.music.play();
 		}
 
 		createPlayer(x : number, y : number) : void {

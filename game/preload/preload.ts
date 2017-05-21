@@ -31,7 +31,6 @@ module GameJam.Preload {
 			this.game.load.tilemap('map7', 'assets/maps/map7.json', null, Phaser.Tilemap.TILED_JSON);
 
 			// Sound
-			//this.game.load.audio('music', 'assets/music.mp3');
 			//this.game.load.audio('laser-snd', 'assets/laser.mp3');
 		}
 
