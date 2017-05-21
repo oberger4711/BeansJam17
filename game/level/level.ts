@@ -43,6 +43,7 @@ module GameJam.Level {
 		private flightLine : Phaser.Line;
 		private victims : Phaser.Group;
 		private containers : Phaser.Group;
+		private speechBubble : Phaser.Sprite;
 		private numberOfTriesLeft : number;
 		private numberOfCaughtEnemies : number;
 		private playerInDarkness : boolean;
@@ -81,6 +82,9 @@ module GameJam.Level {
 			// Parse objects.
 			this.victims = this.game.add.group();
 			this.containers = this.game.add.group();
+			this.speechBubble = this.game.add.sprite(0, 0, 'speechbubble');
+			this.speechBubble.anchor.x = 1;
+			this.speechBubble.anchor.y = 1;
 			this.game.physics.arcade.enable(this.victims);
 			for (let obj of this.map.objects['Objects']) {
 				if (obj.name == "Player") {
@@ -275,6 +279,14 @@ module GameJam.Level {
 			if (this.levelState == ELevelState.FLYING && this.victims.total == 0) {
 				// Caught all victims.
 				container.animations.play('fight');
+				this.speechBubble.x = container.worldX;
+				this.speechBubble.y = container.worldY;
+				this.game.time.events.add(200, () => {
+				}, this);
+				this.speechBubble.alpha = 0;
+				let fadeIn : Phaser.Tween = this.game.add.tween(this.speechBubble).to( { alpha: 1 }, 300, "Linear", true, 300, 0, false);
+				let fadeOut : Phaser.Tween = this.game.add.tween(this.speechBubble).to( { alpha: 0 }, 300, "Linear", false, 1000, 0, false);
+				fadeIn.chain(fadeOut);
 				this.transitionToState(ELevelState.WON);
 			}
 		}
