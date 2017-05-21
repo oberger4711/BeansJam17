@@ -106,7 +106,9 @@ module GameJam.Level {
 			this.ui = this.game.add.group();
 			this.jumpIcons = [];
 			for (let i : number = 0; i < this.numberOfTriesLeft; i++) {
-				let icon : Phaser.Sprite = this.ui.create(i * 100, 0, 'jump');
+				let icon : Phaser.Sprite = this.ui.create(50 + i * 100, 60, 'jump');
+				icon.anchor.x = 0.5;
+				icon.anchor.y = 0.5;
 				icon.fixedToCamera = true;
 				this.jumpIcons.push(icon);
 			}
@@ -432,7 +434,9 @@ module GameJam.Level {
 		}
 
 		removeOneJumpIcon() {
-			this.jumpIcons[this.numberOfTriesLeft].visible = false;
+			let icon : Phaser.Sprite = this.jumpIcons[this.numberOfTriesLeft];
+			this.game.add.tween(icon).to( { alpha: 0 }, 300, "Linear", true, 0, 0, false);
+			this.game.add.tween(icon.scale).to( { x : 2, y: 2 }, 300, "Linear", true, 0, 0, false);
 		}
 
 		switchToNextLevel() : void {
