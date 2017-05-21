@@ -27,6 +27,7 @@ module GameJam.Preload {
 			this.game.load.tilemap('map3', 'assets/maps/map3.json', null, Phaser.Tilemap.TILED_JSON);
 			this.game.load.tilemap('map4', 'assets/maps/map4.json', null, Phaser.Tilemap.TILED_JSON);
 			this.game.load.tilemap('map5', 'assets/maps/map5.json', null, Phaser.Tilemap.TILED_JSON);
+			this.game.load.tilemap('map6', 'assets/maps/map6.json', null, Phaser.Tilemap.TILED_JSON);
 
 			// Sound
 			//this.game.load.audio('music', 'assets/music.mp3');

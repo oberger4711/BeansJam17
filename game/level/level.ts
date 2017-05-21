@@ -2,8 +2,8 @@
 
 module GameJam.Level {
 
-	const LEVEL_MAP_LIST : string[] = ['map1', 'map2', 'map3', 'map4', 'map5'];
-	const NUMBER_OF_TRIES_MAP_LIST : number[] = [3, 3, 3, 3, 1];
+	const LEVEL_MAP_LIST : string[] = ['map1', 'map2', 'map3', 'map4', 'map5', 'map6'];
+	const NUMBER_OF_TRIES_MAP_LIST : number[] = [3, 3, 3, 3, 1, 1];
 	const PLAYER_VELOCITY : number = 300;
 	const VICTIM_VELOCITY : number = 150;
 	const TILE_WIDTH : number = 100;
