@@ -10,8 +10,8 @@ module GameJam.Level {
 	const TILE_HEIGHT : number = TILE_WIDTH;
 	const TILE_INDEX_START_GRIPPY : number = 1;
 	const TILE_INDEX_END_GRIPPY : number = 18;
-	const TILE_INDEX_START_DEADLY : number = 100;
-	const TILE_INDEX_END_DEADLY : number = 100;
+	const TILE_INDEX_START_DEADLY : number = 23;
+	const TILE_INDEX_END_DEADLY : number = 40;
 	const TILE_INDEX_START_BOUNCE : number = 100;
 	const TILE_INDEX_END_BOUNCE : number = 100;
 	const TILE_INDEX_DARKNESS : number = 24;
