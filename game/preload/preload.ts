@@ -8,6 +8,8 @@ module GameJam.Preload {
 			// Images
 			this.game.load.image('tiles', 'assets/maps/tiles/tiles.png');
 			this.game.load.image('darkness', 'assets/maps/tiles/darkness.png');
+			this.game.load.image('background', 'assets/misc/background.png');
+			this.game.load.image('speechbubble', 'assets/misc/speechbubble.png');
 
 			// Spritesheets
 			this.game.load.spritesheet('player', 'assets/spritesheets/player.png', 64, 64);

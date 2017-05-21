@@ -4,12 +4,14 @@ module GameJam.Level {
 
 	const LEVEL_MAP_LIST : string[] = ['map_sticky_test'];
 	const NUMBER_OF_TRIES_MAP_LIST : number[] = [50];
-	const PLAYER_VELOCITY : number = 200;
+	const PLAYER_VELOCITY : number = 300;
 	const VICTIM_VELOCITY : number = 150;
 	const TILE_WIDTH : number = 100;
 	const TILE_HEIGHT : number = TILE_WIDTH;
 	const TILE_INDEX_START_GRIPPY : number = 1;
 	const TILE_INDEX_END_GRIPPY : number = 18;
+	const TILE_INDEX_START_DEADLY : number = 100;
+	const TILE_INDEX_END_DEADLY : number = 100;
 	const TILE_INDEX_START_BOUNCE : number = 100;
 	const TILE_INDEX_END_BOUNCE : number = 100;
 	const TILE_INDEX_DARKNESS : number = 24;
@@ -28,6 +30,7 @@ module GameJam.Level {
 
 	export class Level extends Phaser.State {
 
+		private background : Phaser.Sprite;
 		private music : Phaser.Sound;
 
 		private mapIndex : number;
@@ -58,14 +61,18 @@ module GameJam.Level {
 		}
 
 		create() {
+
 			this.map = this.game.add.tilemap(this.mapName);
 			this.map.addTilesetImage('tiles');
 			this.map.addTilesetImage('darkness');
 			this.map.setCollisionBetween(TILE_INDEX_START_GRIPPY, TILE_INDEX_END_GRIPPY);
+			this.map.setCollisionBetween(TILE_INDEX_START_DEADLY, TILE_INDEX_END_DEADLY);
 			this.map.setCollisionBetween(TILE_INDEX_START_BOUNCE, TILE_INDEX_END_BOUNCE);
 			this.map.setCollisionBetween(TILE_INDEX_DARKNESS, TILE_INDEX_DARKNESS);
 
-			// Parse tiles.
+			// Create visible stuff.
+			this.background = this.game.add.sprite(0, 0, 'background');
+			this.background.fixedToCamera = true;
 			this.layerSpaceship = this.map.createLayer('Spaceship');
 			this.layerSpaceship.resizeWorld();
 
@@ -194,6 +201,9 @@ module GameJam.Level {
 
 		private onPlayerCollidesWithSpaceShip(player, spaceShipTile) {
 			console.log("Collision detected of player with spaceship tile of index " + spaceShipTile.index + ".");
+			if (this.shouldDieFromSpaceShipTile(spaceShipTile)) {
+				this.transitionToState(ELevelState.LOST);
+			}
 			if (this.shouldStickToSpaceShipTile(spaceShipTile)) {
 				// Sticky tile
 				this.playerInDarkness = false;
@@ -236,8 +246,12 @@ module GameJam.Level {
 			}
 		}
 
+		private shouldDieFromSpaceShipTile(spaceShipTile) : boolean {
+			return TILE_INDEX_START_DEADLY <= spaceShipTile.index && spaceShipTile.index <= TILE_INDEX_END_DEADLY;
+		}
+
 		private shouldStickToSpaceShipTile(spaceShipTile) : boolean {
-			return !(TILE_INDEX_START_BOUNCE <= spaceShipTile.index && spaceShipTile.index <= TILE_INDEX_END_BOUNCE);
+			return TILE_INDEX_START_GRIPPY <= spaceShipTile.index && spaceShipTile.index <= TILE_INDEX_END_GRIPPY;
 		}
 
 		private onPlayerOverlapsWithDarkness(player, darknessTile) {
