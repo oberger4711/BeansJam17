@@ -2,17 +2,17 @@
 
 module GameJam.Level {
 
-	const LEVEL_MAP_LIST : string[] = ['map_container_test', 'map_sticky_test', 'map_test'];
-	const NUMBER_OF_TRIES_MAP_LIST : number[] = [50, 50, 3];
+	const LEVEL_MAP_LIST : string[] = ['map_sticky_test'];
+	const NUMBER_OF_TRIES_MAP_LIST : number[] = [50];
 	const PLAYER_VELOCITY : number = 200;
 	const VICTIM_VELOCITY : number = 150;
 	const TILE_WIDTH : number = 100;
 	const TILE_HEIGHT : number = TILE_WIDTH;
 	const TILE_INDEX_START_GRIPPY : number = 1;
-	const TILE_INDEX_END_GRIPPY : number = 1;
-	const TILE_INDEX_START_BOUNCE : number = 3;
-	const TILE_INDEX_END_BOUNCE : number = 3;
-	const TILE_INDEX_DARKNESS : number = 9;
+	const TILE_INDEX_END_GRIPPY : number = 18;
+	const TILE_INDEX_START_BOUNCE : number = 100;
+	const TILE_INDEX_END_BOUNCE : number = 100;
+	const TILE_INDEX_DARKNESS : number = 24;
 
 	enum ELevelState {
 		FLYING,
