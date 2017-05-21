@@ -13,6 +13,7 @@ module GameJam.Level {
 	const TILE_INDEX_START_DEADLY : number = 23;
 	const TILE_INDEX_END_DEADLY : number = 40;
 	const TILE_INDEX_DARKNESS : number = 51;
+	const ESCAPE_DISTANCE : number = 250;
 
 	enum ELevelState {
 		FLYING,
@@ -188,6 +189,12 @@ module GameJam.Level {
 			if (this.levelState == ELevelState.STICKING) {
 				this.player.rotation = this.stickyRotation;
 			}
+			if (this.levelState == ELevelState.FLYING) {
+				this.updateVictimAnimations();
+			}
+			else {
+				this.resetVictimAnimations();
+			}
 			if (this.levelState != ELevelState.WON && this.levelState != ELevelState.LOST) {
 				this.shouldDie = false;
 				this.game.physics.arcade.overlap(this.player, this.layerSpaceship, (p, tile) => { if (this.isTileDeadly(tile)) { this.shouldDie = true }}, null, this);
@@ -212,6 +219,52 @@ module GameJam.Level {
 				this.flightLine.start = this.player.position;
 				this.flightLine.end.x = this.game.input.activePointer.position.x + this.game.camera.view.x;
 				this.flightLine.end.y = this.game.input.activePointer.position.y + this.game.camera.view.y;
+			}
+		}
+
+		private resetVictimAnimations() {
+			this.victims.forEachAlive((v) => {
+				v.animations.play('fly');
+				this.faceVictimToItsDirection(v);
+			}, this);
+		}
+
+		private updateVictimAnimations() {
+			this.victims.forEachAlive((v) => {
+				let distance : number = this.player.position.distance(v.position);
+				if (distance < ESCAPE_DISTANCE) {
+					v.animations.play('escape');
+					v.scale.x = 1;
+					v.scale.y = -1;
+					v.rotation = (Math.PI / 2) + this.game.physics.arcade.angleBetween(v, this.player);
+				}
+				else {
+					v.animations.play('fly');
+					this.faceVictimToItsDirection(v);
+				}
+			}, this);
+		}
+
+		private faceVictimToItsDirection(v) {
+			if (Math.abs(v.body.velocity.x) > 0.1) {
+				// Horizontal
+				v.rotation = Math.PI / 2;
+				if (v.body.velocity.x > 0) {
+					v.scale.y = 1;
+				}
+				else {
+					v.scale.y = -1;
+				}
+			}
+			else {
+				// Vertical
+				v.rotation = Math.PI;
+				if (v.body.velocity.y > 0) {
+					v.scale.y = 1;
+				}
+				else {
+					v.scale.y = -1;
+				}
 			}
 		}
 
@@ -281,13 +334,11 @@ module GameJam.Level {
 		}
 
 		private onVictimCollidesWithSpaceShip(victim, spaceShipTile) {
-			victim.scale.x *= -1;
-			victim.scale.y *= -1;
 		}
 
 		private onPlayerOverlapsWithVictim(player, victim) {
 			if (this.levelState == ELevelState.FLYING) {
-				this.victims.remove(victim);
+				victim.alive = false;
 				this.numberOfCaughtEnemies++;
 			}
 		}
