@@ -2,8 +2,8 @@
 
 module GameJam.Level {
 
-	const LEVEL_MAP_LIST : string[] = ['map1', 'map2', 'map3', 'map4', 'map5', 'map6'];
-	const NUMBER_OF_TRIES_MAP_LIST : number[] = [3, 3, 3, 3, 1, 1];
+	const LEVEL_MAP_LIST : string[] = ['map1', 'map2', 'map3', 'map4', 'map5', 'map6', 'map7'];
+	const NUMBER_OF_TRIES_MAP_LIST : number[] = [3, 3, 3, 3, 1, 1, 1];
 	const PLAYER_VELOCITY : number = 300;
 	const VICTIM_VELOCITY : number = 150;
 	const TILE_WIDTH : number = 100;
@@ -57,8 +57,6 @@ module GameJam.Level {
 		private levelState : ELevelState;
 
 		init(index : number) {
-			// TODO: Remove the following line.
-			index = LEVEL_MAP_LIST.length - 1;
 			this.mapIndex = index;
 			this.mapName = LEVEL_MAP_LIST[index];
 			this.numberOfTriesLeft = NUMBER_OF_TRIES_MAP_LIST[index];
@@ -400,7 +398,7 @@ module GameJam.Level {
 				this.speechBubble.anchor.x = 1;
 				this.speechBubble.anchor.y = 1;
 				this.speechBubble.alpha = 0;
-				let scale : Phaser.Tween = this.game.add.tween(this.speechBubble.scale).to( { x : 0.9, y: 0.7 }, 300, "Linear", true, 0, 999, true);
+				let scale : Phaser.Tween = this.game.add.tween(this.speechBubble.scale).to( { x : 0.6, y: 0.4 }, 300, "Linear", true, 0, 999, true);
 				let fadeIn : Phaser.Tween = this.game.add.tween(this.speechBubble).to( { alpha: 1 }, 300, "Linear", true, 300, 0, false);
 				let fadeOut : Phaser.Tween = this.game.add.tween(this.speechBubble).to( { alpha: 0 }, 300, "Linear", false, 1000, 0, false);
 				fadeIn.chain(fadeOut);
