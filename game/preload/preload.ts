@@ -10,6 +10,7 @@ module GameJam.Preload {
 			this.game.load.image('darkness', 'assets/maps/tiles/darkness.png');
 			this.game.load.image('background', 'assets/misc/background.png');
 			this.game.load.image('speechbubble', 'assets/misc/speechbubble.png');
+			this.game.load.image('jump', 'assets/misc/jump.png');
 			this.game.load.image('cover', 'assets/misc/cover.png');
 			this.game.load.image('instructions0', 'assets/misc/instructions0.png');
 			this.game.load.image('instructions1', 'assets/misc/instructions1.png');

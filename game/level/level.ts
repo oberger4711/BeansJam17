@@ -3,7 +3,7 @@
 module GameJam.Level {
 
 	const LEVEL_MAP_LIST : string[] = ['map_sticky_test'];
-	const NUMBER_OF_TRIES_MAP_LIST : number[] = [50];
+	const NUMBER_OF_TRIES_MAP_LIST : number[] = [5];
 	const PLAYER_VELOCITY : number = 300;
 	const VICTIM_VELOCITY : number = 150;
 	const TILE_WIDTH : number = 100;
@@ -52,8 +52,7 @@ module GameJam.Level {
 		private shouldDie : boolean;
 		private stickyRotation : number;
 		private retryKey : Phaser.Key;
-		private textStyle;
-		private numberOfTriesLeftText : Phaser.Text;
+		private jumpIcons : Phaser.Sprite[];
 
 		private levelState : ELevelState;
 
@@ -105,16 +104,18 @@ module GameJam.Level {
 			}
 			this.layerDarkness = this.map.createLayer('Darkness');
 			this.ui = this.game.add.group();
+			this.jumpIcons = [];
+			for (let i : number = 0; i < this.numberOfTriesLeft; i++) {
+				let icon : Phaser.Sprite = this.ui.create(i * 100, 0, 'jump');
+				icon.fixedToCamera = true;
+				this.jumpIcons.push(icon);
+			}
 
 			// Init other stuff.
 			this.shouldDie = false;
 			this.playerInDarkness = false;
 			this.flightLine = new Phaser.Line();
 			this.numberOfCaughtEnemies = 0;
-			this.textStyle = { font: 'bold 32px "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", "Helvetica", "Arial"', fill: "#ff0000", boundsAlignH: "center", boundsAlignV: "middle" };
-			this.numberOfTriesLeftText = this.game.add.text(0, 0, "", this.textStyle);
-			this.numberOfTriesLeftText.fixedToCamera = true;
-			this.updateNumberOfTriesLeftText();
 
 			// Add event handlers.
 			this.game.input.onDown.add(this.onClickDown, this);
@@ -414,7 +415,7 @@ module GameJam.Level {
 			}
 			if (next == ELevelState.FLYING) {
 				this.numberOfTriesLeft--;
-				this.updateNumberOfTriesLeftText();
+				this.removeOneJumpIcon();
 				this.player.animations.play('fly');
 			}
 			if (next == ELevelState.WON) {
@@ -430,8 +431,8 @@ module GameJam.Level {
 			this.levelState = next;
 		}
 
-		updateNumberOfTriesLeftText() {
-			this.numberOfTriesLeftText.text = "Jumps left: " + this.numberOfTriesLeft;
+		removeOneJumpIcon() {
+			this.jumpIcons[this.numberOfTriesLeft].visible = false;
 		}
 
 		switchToNextLevel() : void {
@@ -443,8 +444,6 @@ module GameJam.Level {
 			if (this.levelState == ELevelState.STICKING) {
 				this.game.debug.geom(this.flightLine);
 			}
-			//this.game.debug.body(this.player);
-			//this.game.debug.body(this.layerSpaceship);
 		}
 	}
 }
