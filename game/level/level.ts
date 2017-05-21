@@ -131,6 +131,7 @@ module GameJam.Level {
 			this.player.animations.add('fly', [0, 1, 2, 3, 4, 5, 6, 7], 10, true);
 			this.player.animations.add('stick', [8], 1, true);
 			this.player.animations.add('bounce', [9], 1, true);
+			this.player.animations.add('grilled', [10, 15], 10, true);
 			this.player.animations.play('fly');
 			this.game.physics.arcade.enable(this.player);
 			this.player.body.velocity.x = -PLAYER_VELOCITY;
@@ -206,9 +207,10 @@ module GameJam.Level {
 		private onPlayerCollidesWithSpaceShip(player, spaceShipTile) {
 			console.log("Collision detected of player with spaceship tile of index " + spaceShipTile.index + ".");
 			if (this.shouldDieFromSpaceShipTile(spaceShipTile)) {
+				this.player.animations.play('grilled');
 				this.transitionToState(ELevelState.LOST);
 			}
-			if (this.shouldStickToSpaceShipTile(spaceShipTile)) {
+			else if (this.shouldStickToSpaceShipTile(spaceShipTile)) {
 				// Sticky tile
 				this.playerInDarkness = false;
 				this.game.physics.arcade.overlap(this.player, this.layerDarkness, this.onPlayerOverlapsWithDarkness, null, this);
@@ -292,6 +294,10 @@ module GameJam.Level {
 		}
 
 		private transitionToState(next : ELevelState) {
+			if (this.levelState == ELevelState.WON || this.levelState == ELevelState.LOST) {
+				// These are final states.
+				return;
+			}
 			if (next == this.levelState) {
 				return;
 			}
@@ -312,7 +318,9 @@ module GameJam.Level {
 				this.game.time.events.add(2000, this.switchToNextLevel, this);
 			}
 			if (next == ELevelState.LOST) {
-				this.player.exists = false;
+				this.player.body.velocity.x = 0;
+				this.player.body.velocity.y = 0;
+				this.player.body.angularVelocity = 0;
 				this.game.time.events.add(2000, this.retry, this);
 			}
 			this.levelState = next;
